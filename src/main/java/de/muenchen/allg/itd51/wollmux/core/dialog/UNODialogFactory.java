@@ -12,8 +12,12 @@ import com.sun.star.awt.XControlModel;
 import com.sun.star.awt.XToolkit;
 import com.sun.star.awt.XWindow;
 import com.sun.star.awt.XWindowPeer;
+import com.sun.star.beans.UnknownPropertyException;
+import com.sun.star.beans.XPropertySet;
 import com.sun.star.frame.XFrame;
 import com.sun.star.frame.XFramesSupplier;
+import com.sun.star.frame.XLayoutManager;
+import com.sun.star.lang.WrappedTargetException;
 import com.sun.star.uno.Exception;
 import com.sun.star.uno.UnoRuntime;
 
@@ -25,6 +29,7 @@ public class UNODialogFactory
       .getLogger(UNODialogFactory.class);
 
   private XWindow modalBaseDialogWindow = null;
+  private XLayoutManager layoutManager = null;
   
   public XWindow createDialog(int width, int height, int backgroundColor)
   {
@@ -71,9 +76,24 @@ public class UNODialogFactory
     }
 
     xFrame.initialize(this.modalBaseDialogWindow);
-    XFramesSupplier creator = UNO.desktop.getCurrentFrame().getCreator();
-    xFrame.setCreator(creator);
+    XFramesSupplier xFramesSupplier = UNO.desktop.getCurrentFrame().getCreator();
+    xFrame.setCreator(xFramesSupplier);
     xFrame.activate();
+    
+    XPropertySet propertySet = UnoRuntime.queryInterface(XPropertySet.class, xFrame);
+    
+    try
+    {
+      Object PropertySetObject = propertySet.getPropertyValue("LayoutManager");
+      layoutManager = UnoRuntime.queryInterface(XLayoutManager.class, PropertySetObject);
+    } catch (UnknownPropertyException e)
+    {
+      LOGGER.error("", e);
+    } catch (WrappedTargetException e)
+    {
+      LOGGER.error("", e);
+    }
+    
     dialogControl.createPeer(xToolkit, modalBaseDialog);
     XWindowPeer testPeer = dialogControl.getPeer();
     testPeer.setBackground(backgroundColor);
@@ -88,6 +108,46 @@ public class UNODialogFactory
     }
 
     return contXWindow;
+  }
+  
+  public XFrame addXFrameToLayoutManager(String name) {
+    
+    if (layoutManager == null) {
+      LOGGER.error("UNODialogFactory: addXFrameToLayoutManager: layoutManager is NULL.");
+      return null;
+    }
+    
+    Object testFrame;
+    XFrame xFrame = null;
+    try
+    {
+      testFrame = UNO.xMCF.createInstanceWithContext(
+          "com.sun.star.frame.Frame", UNO.defaultContext);
+      
+      xFrame = UNO.XFrame(testFrame);
+      xFrame.setName(name);
+      xFrame.deactivate();
+      
+//      Object cont = UNO.createUNOService("com.sun.star.awt.UnoControlContainer");
+//      XControl dialogControl = UnoRuntime.queryInterface(XControl.class, cont);
+//
+//      Object unoControlContainerModelO = UNO
+//          .createUNOService("com.sun.star.awt.UnoControlContainerModel");
+//      XControlModel unoControlContainerModel = UnoRuntime
+//          .queryInterface(XControlModel.class, unoControlContainerModelO);
+//      dialogControl.setModel(unoControlContainerModel);
+//
+//      XWindow contXWindow = UNO.XWindow(dialogControl);
+//      xFrame.setComponent(contXWindow, null);
+      
+      layoutManager.attachFrame(xFrame);
+      layoutManager.doLayout();
+    } catch (Exception e)
+    {
+      LOGGER.error("", e);
+    }
+    
+    return xFrame;
   }
   
   public void showDialog() {
