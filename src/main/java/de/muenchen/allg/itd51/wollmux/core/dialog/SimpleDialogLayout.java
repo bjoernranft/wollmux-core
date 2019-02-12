@@ -33,10 +33,10 @@ public class SimpleDialogLayout implements XWindowListener
 {
   private static final Logger LOGGER = LoggerFactory
       .getLogger(SimpleDialogLayout.class);
-  private XControlContainer controlContainer;
+  private List<XControlContainer> controlContainer = new ArrayList<>();
   private XWindow containerWindow;
   private int marginBetweenControls = 5;
-  private List<ControlModel> controlList = new ArrayList<>();
+  private List<List<ControlModel>> controlList = new ArrayList<>();
   private int yOffset = 0;
   private int xOffset = 0;
   private int marginTop = 0;
@@ -48,8 +48,8 @@ public class SimpleDialogLayout implements XWindowListener
   {
     this.containerWindow = dialogWindow;
     this.containerWindow.addWindowListener(this);
-    this.controlContainer = UnoRuntime.queryInterface(XControlContainer.class,
-        dialogWindow);
+    this.controlContainer.add(UnoRuntime.queryInterface(XControlContainer.class,
+        dialogWindow));
   }
 
   public void draw()
@@ -59,7 +59,7 @@ public class SimpleDialogLayout implements XWindowListener
 
     Rectangle windowRect = this.getContainerWindow().getPosSize();
 
-    for (ControlModel entry : this.getControlList())
+    for (ControlModel entry : this.getControlList(getActiveControlModelIndex()))
     {
       entry.getDock().ifPresent(dock -> this.setDock(windowRect, entry, dock));
 
@@ -68,7 +68,7 @@ public class SimpleDialogLayout implements XWindowListener
         for (SimpleEntry<ControlProperties, XControl> control : entry
             .getControls())
         {
-          XControl controlByControlContainer = this.controlContainer
+          XControl controlByControlContainer = this.controlContainer.get(getActiveControlContainerByIndex())
               .getControl(control.getKey().getControlName());
           if (controlByControlContainer != null)
           {
@@ -90,7 +90,7 @@ public class SimpleDialogLayout implements XWindowListener
         for (SimpleEntry<ControlProperties, XControl> control : entry
             .getControls())
         {
-          XControl controlByControlContainer = this.controlContainer
+          XControl controlByControlContainer = this.controlContainer.get(getActiveControlContainerByIndex())
               .getControl(control.getKey().getControlName());
           if (controlByControlContainer != null)
           {
@@ -109,6 +109,36 @@ public class SimpleDialogLayout implements XWindowListener
 
       this.newLine(entry);
     }
+  }
+  
+  private int activeControlModelIndex = 0;
+  
+  public void setActiveControlModelIndex(int index) {
+    this.activeControlModelIndex = index;
+  }
+  
+  public int getActiveControlModelIndex() {
+    return this.activeControlModelIndex;
+  }
+  
+  private int activeControlContainerIndex = 0;
+  
+  public void setActiveControlContainerByIndex(int index) {
+    this.activeControlContainerIndex = index;
+  }
+  
+  public int getActiveControlContainerByIndex() {
+    return this.activeControlContainerIndex;
+  }
+  
+  public int addControlContainer(XControlContainer container) {
+    this.controlContainer.add(container);
+    
+    return controlContainer.size() - 1;
+  }
+  
+  public void setContainerWindow(XWindow containerWindow) {
+    this.containerWindow = containerWindow;
   }
 
   private Optional<SimpleEntry<ControlProperties, XControl>> getMaxControlHeightByControlList(
@@ -286,14 +316,27 @@ public class SimpleDialogLayout implements XWindowListener
     this.getControlContainer().addControl(name, control);
   }
 
-  public void addControlsToList(ControlModel control)
+  public int addControlsToList(int controlListIndex, ControlModel control)
   {
-    this.controlList.add(control);
+    if (controlList == null || controlList.size() <= controlListIndex)
+    {
+      List<ControlModel> controlModelList = new ArrayList<>();
+      controlModelList.add(control);
+      this.controlList.add(controlModelList);
+    } else {
+      this.controlList.get(controlListIndex).add(control);
+    }
+    
+    return controlList.size() - 1;
   }
 
-  public List<ControlModel> getControlList()
+  public List<ControlModel> getControlList(int index)
   {
-    return this.controlList;
+    return this.controlList.get(index);
+  }
+  
+  public void clearControlList() {
+    this.controlList.removeAll(controlList);
   }
 
   private int getMarginBetweenControls()
@@ -364,7 +407,7 @@ public class SimpleDialogLayout implements XWindowListener
           "BaseLayout: getControlContainer(): controlContainer is NULL.");
     }
 
-    return this.controlContainer;
+    return this.controlContainer.get(getActiveControlContainerByIndex());
   }
 
   public XWindow getContainerWindow()
