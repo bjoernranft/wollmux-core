@@ -51,7 +51,7 @@ public class SimpleDialogLayout implements XWindowListener
     this.controlContainer.add(UnoRuntime.queryInterface(XControlContainer.class,
         dialogWindow));
   }
-
+  
   public void draw()
   {
     this.yOffset = this.getMarginTop() > 0 ? this.getMarginTop() : 0;
