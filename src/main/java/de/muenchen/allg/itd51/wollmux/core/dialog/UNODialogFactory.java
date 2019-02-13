@@ -89,8 +89,8 @@ public class UNODialogFactory
     xFramesSupplier = UNO.desktop.getCurrentFrame().getCreator();
     XFrames xFrames = xFramesSupplier.getFrames();
     xFrames.append(xFrame);
-    xFrame.setCreator(xFramesSupplier);
-    xFrame.activate();
+    //xFrame.setCreator(xFramesSupplier);
+    //xFrame.activate();
     
     XPropertySet propertySet = UnoRuntime.queryInterface(XPropertySet.class, xFrame);
     
@@ -111,7 +111,7 @@ public class UNODialogFactory
     testPeer.setBackground(backgroundColor);
 
     boolean isSuccessfullySet = xFrame.setComponent(contXWindow, null);
-
+    //boolean isSuccessfullySet = true;
     if (!isSuccessfullySet)
     {
       LOGGER.error(
@@ -131,24 +131,18 @@ public class UNODialogFactory
     
     Object testFrame;
     XFrame xFrame = null;
-    XWindow containerWindow = null;
+    XWindow componentWindow = null;
     try
     {
       testFrame = UNO.xMCF.createInstanceWithContext(
           "com.sun.star.frame.Frame", UNO.defaultContext);
       
       xFrame = UNO.XFrame(testFrame);
-      
-      //xFrame.setCreator(getXFramesSupplier());
-      //xFrame.setComponent(contXWindow, null);
-      
       XFrames frames = xFramesSupplier.getFrames();
-//      xFrame.initialize(modalBaseDialogWindow);
-//      xFrame.setCreator(xFramesSupplier);
       xFrame.setName(name);
-      xFrame.initialize(modalBaseDialogWindow);
+      //xFrame.initialize(modalBaseDialogWindow);
       frames.append(xFrame);
-
+      
       xFrame.deactivate();
       
       Object cont = UNO.createUNOService("com.sun.star.awt.UnoControlContainer");
@@ -160,13 +154,9 @@ public class UNODialogFactory
           .queryInterface(XControlModel.class, unoControlContainerModelO);
       dialogControl.setModel(unoControlContainerModel);
 
-      containerWindow = UNO.XWindow(dialogControl);
-      //xFrame.initialize(contXWindow);
-      //xFrame.setCreator(xFramesSupplier);
-      //xFrame.setComponent(contXWindow, null);
-      //XControlContainer container = UnoRuntime.queryInterface(XControlContainer.class, contXWindow);
-      //layoutManager.attachFrame(xFrame);
-      //layoutManager.doLayout();
+      componentWindow = UNO.XWindow(dialogControl);
+      boolean isSuccessfullySet = xFrame.setComponent(componentWindow, null);
+      System.out.println(isSuccessfullySet);
     } catch (Exception e)
     {
       LOGGER.error("", e);
@@ -203,68 +193,64 @@ public class UNODialogFactory
       }
     }
     
-//    XFrames frames = getXFramesSupplier().getFrames();
+    for (int i = 0; i < getXFramesSupplier().getFrames().getCount(); i++) {
+        try
+        {
+          XFrame xFrame2 = UNO.XFrame(getXFramesSupplier().getFrames().getByIndex(i));
+          
+          if(xFrame2.getName().equals("DefaultFrame")) {
+        	  getXFramesSupplier().getFrames().remove(xFrame2);
+          }
+          
+          //System.out.println(xFrame.getName() + " " + xFrame.isActive());
+        } catch (IndexOutOfBoundsException e)
+        {
+          // TODO Auto-generated catch block
+          e.printStackTrace();
+        } catch (WrappedTargetException e)
+        {
+          // TODO Auto-generated catch block
+          e.printStackTrace();
+        }
+      }
+    
+//    for (int i = 0; i < getXFramesSupplier().getFrames().getCount(); i++) {
+//        try
+//        {
+//          XFrame xFrame2 = UNO.XFrame(getXFramesSupplier().getFrames().getByIndex(i));
+//          
+//          if(xFrame2.getName().isEmpty()) {
+//        	  getXFramesSupplier().getFrames().remove(xFrame2);
+//          }
+//          
+//          //System.out.println(xFrame.getName() + " " + xFrame.isActive());
+//        } catch (IndexOutOfBoundsException e)
+//        {
+//          // TODO Auto-generated catch block
+//          e.printStackTrace();
+//        } catch (WrappedTargetException e)
+//        {
+//          // TODO Auto-generated catch block
+//          e.printStackTrace();
+//        }
+//      }
 //    
-//    for(XFrame index : frame) {
-//    	System.out.println(index.getName());
-//    }
-    
-    for (int i = 0; i < getXFramesSupplier().getFrames().getCount(); i++) {
-        try
-        {
-          XFrame xFrame2 = UNO.XFrame(getXFramesSupplier().getFrames().getByIndex(i));
-          
-          if(xFrame2.getName().equals("DefaultFrame"))
-        	  getXFramesSupplier().getFrames().remove(xFrame2);
-          
-          //System.out.println(xFrame.getName() + " " + xFrame.isActive());
-        } catch (IndexOutOfBoundsException e)
-        {
-          // TODO Auto-generated catch block
-          e.printStackTrace();
-        } catch (WrappedTargetException e)
-        {
-          // TODO Auto-generated catch block
-          e.printStackTrace();
-        }
-      }
-    
-    for (int i = 0; i < getXFramesSupplier().getFrames().getCount(); i++) {
-        try
-        {
-          XFrame xFrame2 = UNO.XFrame(getXFramesSupplier().getFrames().getByIndex(i));
-          
-          if(xFrame2.getName().isEmpty())
-        	  getXFramesSupplier().getFrames().remove(xFrame2);
-          
-          //System.out.println(xFrame.getName() + " " + xFrame.isActive());
-        } catch (IndexOutOfBoundsException e)
-        {
-          // TODO Auto-generated catch block
-          e.printStackTrace();
-        } catch (WrappedTargetException e)
-        {
-          // TODO Auto-generated catch block
-          e.printStackTrace();
-        }
-      }
-    
-    for (int i = 0; i < getXFramesSupplier().getFrames().getCount(); i++) {
-        try
-        {
-          XFrame xFrame3 = UNO.XFrame(getXFramesSupplier().getFrames().getByIndex(i));
-          
-          System.out.println(xFrame3.getName() + " " + xFrame3.isActive());
-        } catch (IndexOutOfBoundsException e)
-        {
-          // TODO Auto-generated catch block
-          e.printStackTrace();
-        } catch (WrappedTargetException e)
-        {
-          // TODO Auto-generated catch block
-          e.printStackTrace();
-        }
-      }
+//    for (int i = 0; i < getXFramesSupplier().getFrames().getCount(); i++) {
+//        try
+//        {
+//          XFrame xFrame3 = UNO.XFrame(getXFramesSupplier().getFrames().getByIndex(i));
+//          
+//          System.out.println(xFrame3.getName() + " " + xFrame3.isActive());
+//        } catch (IndexOutOfBoundsException e)
+//        {
+//          // TODO Auto-generated catch block
+//          e.printStackTrace();
+//        } catch (WrappedTargetException e)
+//        {
+//          // TODO Auto-generated catch block
+//          e.printStackTrace();
+//        }
+//      }
     
     return targetFrame;
   }
