@@ -6,6 +6,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.sun.star.awt.MouseEvent;
 import com.sun.star.awt.Rectangle;
 import com.sun.star.awt.WindowAttribute;
 import com.sun.star.awt.WindowClass;
@@ -13,6 +14,7 @@ import com.sun.star.awt.WindowDescriptor;
 import com.sun.star.awt.XControl;
 import com.sun.star.awt.XControlContainer;
 import com.sun.star.awt.XControlModel;
+import com.sun.star.awt.XMouseListener;
 import com.sun.star.awt.XToolkit;
 import com.sun.star.awt.XWindow;
 import com.sun.star.awt.XWindowPeer;
@@ -23,6 +25,7 @@ import com.sun.star.frame.XFrame;
 import com.sun.star.frame.XFrames;
 import com.sun.star.frame.XFramesSupplier;
 import com.sun.star.frame.XLayoutManager;
+import com.sun.star.lang.EventObject;
 import com.sun.star.lang.IndexOutOfBoundsException;
 import com.sun.star.lang.WrappedTargetException;
 import com.sun.star.uno.Exception;
@@ -39,6 +42,9 @@ public class UNODialogFactory
   private XLayoutManager layoutManager = null;
   private XFramesSupplier xFramesSupplier = null;
   private XWindow contXWindow = null;
+  private XToolkit xToolkit = null;
+  private XWindowPeer modalBaseDialog = null;
+  private XFrame xFrame = null;
   
   public XWindow createDialog(int width, int height, int backgroundColor)
   {
@@ -54,7 +60,6 @@ public class UNODialogFactory
     contXWindow = UNO.XWindow(dialogControl);
 
     Object toolkit = null;
-    XToolkit xToolkit = null;
     try
     {
       toolkit = UNO.xMCF.createInstanceWithContext(
@@ -67,12 +72,12 @@ public class UNODialogFactory
    
     XWindow currentWindow = UNO.desktop.getCurrentFrame().getContainerWindow();
     XWindowPeer currentWindowPeer = UNO.XWindowPeer(currentWindow);
-    XWindowPeer modalBaseDialog = createModalBaseDialog(xToolkit,
+    modalBaseDialog = createModalBaseDialog(xToolkit,
         currentWindowPeer, width, height);
     this.modalBaseDialogWindow = UNO.XWindow(modalBaseDialog);
 
     Object testFrame;
-    XFrame xFrame = null;
+    
     try
     {
       testFrame = UNO.xMCF.createInstanceWithContext(
@@ -92,20 +97,6 @@ public class UNODialogFactory
     //xFrame.setCreator(xFramesSupplier);
     //xFrame.activate();
     
-    XPropertySet propertySet = UnoRuntime.queryInterface(XPropertySet.class, xFrame);
-    
-    try
-    {
-      Object PropertySetObject = propertySet.getPropertyValue("LayoutManager");
-      layoutManager = UnoRuntime.queryInterface(XLayoutManager.class, PropertySetObject);
-    } catch (UnknownPropertyException e)
-    {
-      LOGGER.error("", e);
-    } catch (WrappedTargetException e)
-    {
-      LOGGER.error("", e);
-    }
-    
     dialogControl.createPeer(xToolkit, modalBaseDialog);
     XWindowPeer testPeer = dialogControl.getPeer();
     testPeer.setBackground(backgroundColor);
@@ -124,27 +115,24 @@ public class UNODialogFactory
   
   public XWindow addXFrameToLayoutManager(String name) {
     
-    if (layoutManager == null) {
-      LOGGER.error("UNODialogFactory: addXFrameToLayoutManager: layoutManager is NULL.");
-      return null;
-    }
-    
     Object testFrame;
-    XFrame xFrame = null;
+    XFrame xFrame2 = null;
     XWindow componentWindow = null;
     try
     {
       testFrame = UNO.xMCF.createInstanceWithContext(
           "com.sun.star.frame.Frame", UNO.defaultContext);
       
-      xFrame = UNO.XFrame(testFrame);
+      xFrame2 = UNO.XFrame(testFrame);
       XFrames frames = xFramesSupplier.getFrames();
-      xFrame.setName(name);
-      //xFrame.initialize(modalBaseDialogWindow);
-      frames.append(xFrame);
-      
-      xFrame.deactivate();
-      
+      xFrame2.setName(name);
+      xFrame2.initialize(modalBaseDialogWindow);
+      frames.append(xFrame2);
+
+      // https://wiki.openoffice.org/wiki/Documentation/DevGuide/OfficeDev/Frames#Linking_Components_and_Windows
+      //xFrame2.initialize(xFrame.getComponentWindow());
+      //xFrame2.setCreator(XFramesSupplier);
+
       Object cont = UNO.createUNOService("com.sun.star.awt.UnoControlContainer");
       XControl dialogControl = UnoRuntime.queryInterface(XControl.class, cont);
 
@@ -155,14 +143,16 @@ public class UNODialogFactory
       dialogControl.setModel(unoControlContainerModel);
 
       componentWindow = UNO.XWindow(dialogControl);
-      boolean isSuccessfullySet = xFrame.setComponent(componentWindow, null);
+
+      //boolean isSuccessfullySet = xFrame2.setComponent(componentWindow, null);
+      boolean isSuccessfullySet = xFrame2.setComponent(componentWindow, null);
       System.out.println(isSuccessfullySet);
     } catch (Exception e)
     {
       LOGGER.error("", e);
     }
     
-    return containerWindow;
+    return componentWindow;
   }
   
   public XFrame setActiveFrame(String frameName) {
@@ -175,7 +165,7 @@ public class UNODialogFactory
         
         if (xFrame.getName() != null && xFrame.getName().equals(frameName)) {
           xFrame.activate();
-         getXFramesSupplier().setActiveFrame(xFrame);
+         //getXFramesSupplier().setActiveFrame(xFrame);
           targetFrame = xFrame;
         } else {
 //        	XFrames frames = getXFramesSupplier().getFrames();
@@ -192,27 +182,27 @@ public class UNODialogFactory
         e.printStackTrace();
       }
     }
-    
-    for (int i = 0; i < getXFramesSupplier().getFrames().getCount(); i++) {
-        try
-        {
-          XFrame xFrame2 = UNO.XFrame(getXFramesSupplier().getFrames().getByIndex(i));
-          
-          if(xFrame2.getName().equals("DefaultFrame")) {
-        	  getXFramesSupplier().getFrames().remove(xFrame2);
-          }
-          
-          //System.out.println(xFrame.getName() + " " + xFrame.isActive());
-        } catch (IndexOutOfBoundsException e)
-        {
-          // TODO Auto-generated catch block
-          e.printStackTrace();
-        } catch (WrappedTargetException e)
-        {
-          // TODO Auto-generated catch block
-          e.printStackTrace();
-        }
-      }
+//    
+//    for (int i = 0; i < getXFramesSupplier().getFrames().getCount(); i++) {
+//        try
+//        {
+//          XFrame xFrame2 = UNO.XFrame(getXFramesSupplier().getFrames().getByIndex(i));
+//          
+//          if(xFrame2.getName().equals("DefaultFrame")) {
+//        	  getXFramesSupplier().getFrames().remove(xFrame2);
+//          }
+//          
+//          //System.out.println(xFrame.getName() + " " + xFrame.isActive());
+//        } catch (IndexOutOfBoundsException e)
+//        {
+//          // TODO Auto-generated catch block
+//          e.printStackTrace();
+//        } catch (WrappedTargetException e)
+//        {
+//          // TODO Auto-generated catch block
+//          e.printStackTrace();
+//        }
+//      }
     
 //    for (int i = 0; i < getXFramesSupplier().getFrames().getCount(); i++) {
 //        try
