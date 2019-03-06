@@ -131,7 +131,8 @@ public class ControlModel
     NUMERIC_FIELD("com.sun.star.awt.UnoControlNumericField"),
     FIXEDLINE("com.sun.star.awt.UnoControlFixedLine"),
     GROUPBOX("com.sun.star.awt.UnoControlGroupBox"),
-    LIST_BOX("com.sun.star.awt.UnoControlListBox");
+    LIST_BOX("com.sun.star.awt.UnoControlListBox"),
+    TAB_CONTAINER("com.sun.star.awt.tab.UnoControlTabPageContainer");
 
     private String controlType;
 

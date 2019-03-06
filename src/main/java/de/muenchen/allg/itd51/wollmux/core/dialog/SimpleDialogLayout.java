@@ -285,6 +285,20 @@ public class SimpleDialogLayout extends AbstractWindowListener
   {
     this.getControlContainer().addControl(name, control);
   }
+  
+  public void setControlContainer(XControlContainer container) {
+    this.controlContainer = container;
+  }
+  
+  public void clearControlContainer() {
+    for (XControl control : this.getControlContainer().getControls()) {
+      this.getControlContainer().removeControl(control);
+    }
+  }
+  
+  public void clearControlList() {
+    this.controlList.removeAll(this.controlList);
+  }
 
   public void addControlsToList(ControlModel control)
   {
