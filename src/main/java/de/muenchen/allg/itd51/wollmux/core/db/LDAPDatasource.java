@@ -503,6 +503,11 @@ public class LDAPDatasource implements Datasource
         continue;
       }
       String[] ks = currentKey.split(KEY_SEPARATOR_0_NON_0_RE, 2);
+      String ksResult = ks[0];
+
+      if (ksResult.contains("lhmObjectID=*"))
+        continue;
+
       searchFilter.append(ks[0]);
     }
     if (searchFilter.length() == 0)

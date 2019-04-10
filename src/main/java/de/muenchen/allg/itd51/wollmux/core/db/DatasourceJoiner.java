@@ -129,7 +129,7 @@ public class DatasourceJoiner
   
   private List<Dataset> cachedQueryResults = new ArrayList<>();
 
-  public static final long DATASOURCE_TIMEOUT = 10000;
+  public static final long DATASOURCE_TIMEOUT = 9999999;
   
   /**
    * Repräsentiert den Status eines DatasourceJoiners.
@@ -569,23 +569,25 @@ public class DatasourceJoiner
   public void addCachedLdapResult(Dataset ds)
   {
     Iterator<Dataset> datasetIterator = this.cachedQueryResults.iterator();
-    
-    while (datasetIterator.hasNext()) {
+
+    while (datasetIterator.hasNext())
+    {
       Dataset dataset = datasetIterator.next();
       try
       {
-        if (dataset.get("OID").equals(ds.get("OID"))) {
+        if (dataset.get("OID").equals(ds.get("OID")))
+        {
           datasetIterator.remove();
         }
       } catch (ColumnNotFoundException e)
       {
         LOGGER.error("", e);
       }
-   }
-  
+    }
+
     this.cachedQueryResults.add(ds);
   }
-  
+
   public List<Dataset> getCachedLdapResults()
   {
     return this.cachedQueryResults;
