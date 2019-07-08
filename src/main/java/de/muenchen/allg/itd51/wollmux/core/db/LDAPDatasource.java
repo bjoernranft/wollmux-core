@@ -154,6 +154,8 @@ public class LDAPDatasource implements Datasource
     Pattern.compile("^(\\(&(\\([^()=]+[^()]*\\))+\\))?" + KEY_SEPARATOR_0_NON_0_RE
       + "([a-zA-Z_][a-zA-Z0-9_]*=.*" + SEPARATOR + ")?$");
 
+  private static final Pattern KEY_WILDCARD = Pattern.compile("^.+(\\w+)([=])([*]).+$");
+
   /**
    * temporärer cache für relative Attribute (wird bei jeder neuen Suche neu
    * angelegt)
@@ -502,6 +504,12 @@ public class LDAPDatasource implements Datasource
       if (!KEY_RE.matcher(currentKey).matches()) {
         continue;
       }
+
+      if (KEY_WILDCARD.matcher(currentKey).matches())
+      {
+        continue;
+      }
+
       String[] ks = currentKey.split(KEY_SEPARATOR_0_NON_0_RE, 2);
       searchFilter.append(ks[0]);
     }
