@@ -256,7 +256,7 @@ public class OverlayDatasource implements Datasource
    * @see de.muenchen.allg.itd51.wollmux.db.Datasource#find(java.util.List, long)
    */
   @Override
-  public QueryResults find(List<QueryPart> query, long timeout)
+  public QueryResults find(List<QueryPart> query, boolean doRelativeSearch, long timeout)
       throws TimeoutException
   {
     if (query.isEmpty()) {
@@ -299,7 +299,7 @@ public class OverlayDatasource implements Datasource
      */
     if (!queryOnly1.isEmpty())
     {
-      QueryResults results = source1.find(queryOnly1, timeout);
+      QueryResults results = source1.find(queryOnly1, true, timeout);
 
       List<QueryPart> restQuery =
           new ArrayList<>(queryOnly2.size() + queryBoth.size());
@@ -323,7 +323,7 @@ public class OverlayDatasource implements Datasource
        * Filtern dann nochmal mit den Spaltenbedingungen für die gemeinsamen Spalten.
        */
 
-      QueryResults results = source2.find(queryOnly2, timeout);
+      QueryResults results = source2.find(queryOnly2, true, timeout);
 
       DatasetChecker filter = DatasetChecker.makeChecker(queryBoth);
 
@@ -360,7 +360,7 @@ public class OverlayDatasource implements Datasource
       List<QueryPart> restrictingQuery = new ArrayList<>(1);
       restrictingQuery.add(qp);
 
-      QueryResults results1 = source1.find(restrictingQuery, timeout);
+      QueryResults results1 = source1.find(restrictingQuery, true, timeout);
 
       timeout = endtime - System.currentTimeMillis();
       if (timeout < 0) {
@@ -368,7 +368,7 @@ public class OverlayDatasource implements Datasource
       }
       results1 = overlayColumns(results1, timeout, filter);
 
-      QueryResults results2 = source2.find(restrictingQuery, timeout);
+      QueryResults results2 = source2.find(restrictingQuery, true, timeout);
 
       timeout = endtime - System.currentTimeMillis();
       if (timeout < 0) {
@@ -516,7 +516,7 @@ public class OverlayDatasource implements Datasource
       if (timeout <= 0) {
         throw new TimeoutException();
       }
-      QueryResults appendix = source2.find(query, timeout);
+      QueryResults appendix = source2.find(query, true, timeout);
 
       Dataset newDataset;
 
@@ -572,7 +572,7 @@ public class OverlayDatasource implements Datasource
       if (timeout <= 0) {
         throw new TimeoutException();
       }
-      QueryResults prependix = source1.find(query, timeout);
+      QueryResults prependix = source1.find(query, true, timeout);
 
       for (Dataset prepend : prependix)
       {

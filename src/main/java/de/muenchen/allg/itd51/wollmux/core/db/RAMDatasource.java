@@ -126,7 +126,7 @@ public class RAMDatasource implements Datasource
    * @see de.muenchen.allg.itd51.wollmux.db.Datasource#find(java.util.List, long)
    */
   @Override
-  public QueryResults find(List<QueryPart> query, long timeout)
+  public QueryResults find(List<QueryPart> query, boolean doRelativeSearch, long timeout)
       throws TimeoutException
   { // TESTED
     if (query.isEmpty()) {

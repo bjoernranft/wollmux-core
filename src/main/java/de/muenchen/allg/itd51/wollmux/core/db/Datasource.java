@@ -100,7 +100,7 @@ public interface Datasource
    * @throws TimeoutException
    *           falls die Anfrage nicht rechtzeitig beendet werden konnte.
    */
-  public QueryResults find(List<QueryPart> query, long timeout)
+  public QueryResults find(List<QueryPart> query, boolean doRelativeSearch, long timeout)
       throws TimeoutException;
 
   /**

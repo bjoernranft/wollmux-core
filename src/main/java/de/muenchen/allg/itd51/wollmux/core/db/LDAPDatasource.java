@@ -477,7 +477,7 @@ public class LDAPDatasource implements Datasource
           if (timeout <= 0) {
             throw new TimeoutException();
           }
-          QueryResults res = find(query, timeout);
+          QueryResults res = find(query, true, timeout);
           for (Dataset ds : res)
             results.add(ds);
         }
@@ -658,7 +658,7 @@ public class LDAPDatasource implements Datasource
    * @see de.muenchen.allg.itd51.wollmux.db.Datasource#find(java.util.List, long)
    */
   @Override
-  public QueryResults find(List<QueryPart> query, long timeout)
+  public QueryResults find(List<QueryPart> query, boolean doRelativeSearch, long timeout)
       throws TimeoutException
   {
 
@@ -693,11 +693,17 @@ public class LDAPDatasource implements Datasource
       {
         continue;
       }
-
+      
       String columnObjectClass = colDef.columnObjectClass;
       String currentSearchFilter =
-          "(" + ldapEscape(attributeName) + "~=" + ldapEscape(attributeValue)
+          "(" + ldapEscape(attributeName) + "=" + ldapEscape(attributeValue)
               + ")";
+      
+      if (doRelativeSearch)
+        currentSearchFilter =
+        "(" + ldapEscape(attributeName) + "~=" + ldapEscape(attributeValue)
+            + ")";
+      
       if (columnObjectClass != null)
       {
         currentSearchFilter =

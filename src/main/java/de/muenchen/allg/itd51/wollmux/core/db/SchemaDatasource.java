@@ -215,7 +215,7 @@ public class SchemaDatasource implements Datasource
   }
 
   @Override
-  public QueryResults find(List<QueryPart> query, long timeout)
+  public QueryResults find(List<QueryPart> query, boolean doRelativeSearch, long timeout)
       throws TimeoutException
   {
     List<QueryPart> translatedQuery = new ArrayList<>(query.size());
@@ -238,7 +238,7 @@ public class SchemaDatasource implements Datasource
       else
         translatedQuery.add(p);
     }
-    return wrapDatasets(source.find(translatedQuery, timeout));
+    return wrapDatasets(source.find(translatedQuery, true, timeout));
   }
 
   @Override

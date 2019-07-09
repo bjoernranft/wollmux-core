@@ -375,7 +375,7 @@ public class DatasourceJoiner
     }
 
     // Suche ausführen.
-    return source.find(query.getQueryParts(), queryTimeout());
+    return source.find(query.getQueryParts(), true, queryTimeout());
   }
 
   /**
@@ -388,7 +388,7 @@ public class DatasourceJoiner
    */
   public QueryResults find(List<QueryPart> query) throws TimeoutException
   { // TESTED
-    QueryResults res = mainDatasource.find(query, queryTimeout());
+    QueryResults res = mainDatasource.find(query, true, queryTimeout());
     List<DJDatasetWrapper> djDatasetsList = StreamSupport
         .stream(res.spliterator(), false)
         .map(ds -> new DJDatasetWrapper(ds))

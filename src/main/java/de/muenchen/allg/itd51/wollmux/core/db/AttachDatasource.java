@@ -231,7 +231,7 @@ public class AttachDatasource implements Datasource
    * long)
    */
   @Override
-  public QueryResults find(List<QueryPart> query, long timeout) throws TimeoutException
+  public QueryResults find(List<QueryPart> query, boolean doRelativeSearch, long timeout) throws TimeoutException
   {
     long time = new Date().getTime();
     List<QueryPart> query1 = new ArrayList<>(query.size() / 2);
@@ -255,7 +255,7 @@ public class AttachDatasource implements Datasource
      */
     if (!query1.isEmpty())
     {
-      QueryResults results = source1.find(query1, timeout);
+      QueryResults results = source1.find(query1, true, timeout);
       time = (new Date().getTime()) - time;
       timeout -= time;
       if (timeout <= 0)
@@ -266,7 +266,7 @@ public class AttachDatasource implements Datasource
       return attachColumns(results, timeout, filter);
     } else
     {
-      QueryResults results = source2.find(query2, timeout);
+      QueryResults results = source2.find(query2, true, timeout);
       time = (new Date().getTime()) - time;
       timeout -= time;
       if (timeout <= 0)
@@ -311,7 +311,7 @@ public class AttachDatasource implements Datasource
       {
         throw new TimeoutException();
       }
-      QueryResults appendix = source2.find(query, timeout);
+      QueryResults appendix = source2.find(query, true, timeout);
 
       Dataset newDataset;
 
@@ -364,7 +364,7 @@ public class AttachDatasource implements Datasource
       {
         throw new TimeoutException();
       }
-      QueryResults prependix = source1.find(query, timeout);
+      QueryResults prependix = source1.find(query, true, timeout);
 
       if (prependix.size() > 0)
       {

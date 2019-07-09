@@ -189,11 +189,11 @@ public class PreferDatasource implements Datasource
   }
 
   @Override
-  public QueryResults find(List<QueryPart> query, long timeout)
+  public QueryResults find(List<QueryPart> query, boolean doRelativeSearch, long timeout)
       throws TimeoutException
   {
     long endTime = System.currentTimeMillis() + timeout;
-    QueryResults results = source2.find(query, timeout);
+    QueryResults results = source2.find(query, true, timeout);
 
     timeout = endTime - System.currentTimeMillis();
     if (timeout <= 0)
@@ -201,7 +201,7 @@ public class PreferDatasource implements Datasource
         "Datenquelle %1 konnte Anfrage find() nicht schnell genug beantworten",
         source2Name));
 
-    QueryResults overrideResults = source1.find(query, timeout);
+    QueryResults overrideResults = source1.find(query, true, timeout);
 
     timeout = endTime - System.currentTimeMillis();
     if (timeout <= 0)

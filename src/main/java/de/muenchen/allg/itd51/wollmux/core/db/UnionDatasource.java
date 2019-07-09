@@ -171,18 +171,18 @@ public class UnionDatasource implements Datasource
   }
 
   @Override
-  public QueryResults find(List<QueryPart> query, long timeout)
+  public QueryResults find(List<QueryPart> query, boolean doRelativeSearch, long timeout)
       throws TimeoutException
   {
     long time = new Date().getTime();
-    QueryResults res1 = source1.find(query, timeout);
+    QueryResults res1 = source1.find(query, true, timeout);
     time = (new Date().getTime()) - time;
     timeout -= time;
     if (timeout <= 0)
       throw new TimeoutException(L.m(
         "Datenquelle \"%1\" konnte Anfrage find() nicht schnell genug beantworten",
         source1Name));
-    QueryResults res2 = source2.find(query, timeout);
+    QueryResults res2 = source2.find(query, true, timeout);
     return new QueryResultsUnion(res1, res2);
   }
 

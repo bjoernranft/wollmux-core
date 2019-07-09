@@ -466,7 +466,7 @@ public class OOoDatasource implements Datasource
   }
 
   @Override
-  public QueryResults find(List<QueryPart> query, long timeout)
+  public QueryResults find(List<QueryPart> query, boolean doRelativeSearch, long timeout)
       throws TimeoutException
   { // TESTED
     if (query.isEmpty()) {
