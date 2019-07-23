@@ -41,11 +41,9 @@ package de.muenchen.allg.itd51.wollmux.core.document;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.io.StringReader;
-import java.io.StringWriter;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -60,7 +58,6 @@ import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.commons.lang3.text.translate.CharSequenceTranslator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -413,7 +410,7 @@ public class TextDocumentModel
    * immer den Zustand beim Öffnen repräsentieren. Der modified-Zustand des Dokuments
    * wird durch diese Funktion nicht verändert.
    */
-  public synchronized void updateLastTouchedByVersionInfo()
+  public void updateLastTouchedByVersionInfo()
   {
     if (!haveUpdatedLastTouchedByVersionInfo)
     {
@@ -432,7 +429,7 @@ public class TextDocumentModel
    *
    * @return der Dokument-Kommandobaum dieses Dokuments.
    */
-  public synchronized DocumentCommands getDocumentCommands()
+  public DocumentCommands getDocumentCommands()
   {
     return documentCommands;
   }
@@ -444,7 +441,7 @@ public class TextDocumentModel
    * GROUPS-Erweiterung) und dann alle Dokumentkommandos des Kommandobaumes in der
    * Reihenfolge, die DocumentCommandTree.depthFirstIterator(false) liefert.
    */
-  public synchronized Iterator<VisibilityElement> visibleElementsIterator()
+  public Iterator<VisibilityElement> visibleElementsIterator()
   {
     ArrayList<VisibilityElement> visibleElements = new ArrayList<>();
     for (VisibilityElement ve : documentCommands.getSetGroups())
@@ -619,7 +616,7 @@ public class TextDocumentModel
    *
    * @param idToFormFields
    */
-  public synchronized void setIDToFormFields(
+  public void setIDToFormFields(
       Map<String, List<FormFieldFactory.FormField>> idToFormFields)
   {
     this.idToFormFields = idToFormFields;
@@ -678,7 +675,7 @@ public class TextDocumentModel
    *           Ersetzungsregel sind, dann entsteht eine Ersetzungskette, die nicht
    *           zugelassen ist.
    */
-  public synchronized void setOverrideFrag(String fragId, String newFragId)
+  public void setOverrideFrag(String fragId, String newFragId)
       throws OverrideFragChainException
   {
     if (overrideFragMap.containsKey(newFragId))
@@ -715,7 +712,7 @@ public class TextDocumentModel
    * soll und durch ein WM(CMD 'overrideFrag'...)-Kommando gesetzt wurde, oder fragId
    * (also sich selbst), wenn keine Überschreibung definiert ist.
    */
-  public synchronized String getOverrideFrag(String fragId)
+  public String getOverrideFrag(String fragId)
   {
     if (overrideFragMap.containsKey(fragId))
       return overrideFragMap.get(fragId);
@@ -756,7 +753,7 @@ public class TextDocumentModel
    *         "Bearbeiten"-Modus geöffnetes Dokument handelt oder false, wenn das
    *         Dokument keine URL besitzt und es sich damit um eine Vorlage handelt.
    */
-  public synchronized boolean hasURL()
+  public boolean hasURL()
   {
     return doc.getURL() != null && !doc.getURL().isEmpty();
   }
@@ -781,7 +778,7 @@ public class TextDocumentModel
    * nicht-leeren Fenster-Abschnitt enthält. In diesem Fall soll die FormGUI
    * gestartet werden.
    */
-  public synchronized boolean hasFormGUIWindow()
+  public boolean hasFormGUIWindow()
   {
     try
     {
@@ -926,7 +923,7 @@ public class TextDocumentModel
    *          Das Sichtbarkeitselement, auf dessen Anfang des Ankers der ViewCursor
    *          gesetzt werden soll.
    */
-  public synchronized void focusRangeStart(VisibilityElement visibleElement)
+  public void focusRangeStart(VisibilityElement visibleElement)
   {
     try
     {
@@ -947,7 +944,7 @@ public class TextDocumentModel
    *         setJumpMark-Dokumentkommandos dieses Dokuments enthält oder null falls
    *         kein solches Dokumentkommando vorhanden ist.
    */
-  public synchronized SetJumpMark getFirstJumpMark()
+  public SetJumpMark getFirstJumpMark()
   {
     return documentCommands.getFirstJumpMark();
   }
@@ -955,7 +952,7 @@ public class TextDocumentModel
   /**
    * Diese Methode liefert die FeldIDs aller im Dokument enthaltenen Felder.
    */
-  public synchronized Set<String> getAllFieldIDs()
+  public Set<String> getAllFieldIDs()
   {
     HashSet<String> ids = new HashSet<>();
     ids.addAll(idToFormFields.keySet());
@@ -963,7 +960,7 @@ public class TextDocumentModel
     return ids;
   }
 
-  public synchronized Map<String, String> getFormFieldValues()
+  public Map<String, String> getFormFieldValues()
   {
     return formFieldValues;
   }
@@ -973,12 +970,12 @@ public class TextDocumentModel
    * Schlüssel. Änderungen an der zurückgelieferten Map zeigen keine Wirkung im
    * TextDocumentModel (da nur eine Kopie der internen Map zurückgegeben wird).
    */
-  public synchronized Map<String, String> getFormFieldValuesMap()
+  public Map<String, String> getFormFieldValuesMap()
   {
     return new HashMap<>(formFieldValues);
   }
 
-  public synchronized void clearFormFieldValues()
+  public void clearFormFieldValues()
   {
     for (String key : formFieldValues.keySet())
     {
@@ -1054,7 +1051,7 @@ public class TextDocumentModel
    * Seriendruck-Metadaten, so liefert diese Methode einen leeren
    * "Seriendruck"-Knoten zurück.
    */
-  public synchronized ConfigThingy getMailmergeConfig()
+  public ConfigThingy getMailmergeConfig()
   {
     if (mailmergeConf == null)
     {
