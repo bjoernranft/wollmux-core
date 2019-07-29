@@ -561,88 +561,58 @@ public class DatasourceJoiner
     return new QueryResultsList(myLOS.iterator(), myLOS.size());
   }
   
-  public void setCachedLdapResults(QueryResults results)
-  {
-    results.forEach(ds -> this.cachedQueryResults.add(ds));
-  }
-  
-  public void addCachedLdapResult(Dataset ds)
-  {
-    Iterator<Dataset> datasetIterator = this.cachedQueryResults.iterator();
-    
-    while (datasetIterator.hasNext()) {
-      Dataset dataset = datasetIterator.next();
-      try
-      {
-        if (dataset.get("OID").equals(ds.get("OID"))) {
-          datasetIterator.remove();
-        }
-      } catch (ColumnNotFoundException e)
-      {
-        LOGGER.error("", e);
-      }
-   }
-  
-    this.cachedQueryResults.add(ds);
-  }
-  
-  public List<Dataset> getCachedLdapResults()
-  {
-    return this.cachedQueryResults;
-  }
-  
-  public Dataset getCachedLdapResultByOID(String oid)
-  {
-    if (this.cachedQueryResults == null || this.cachedQueryResults.isEmpty())
-      return null;
+//  public Dataset getCachedLdapResultByOID(String oid)
+//  {
+//    if (this.cachedQueryResults == null || this.cachedQueryResults.isEmpty())
+//      return null;
+//
+//    Dataset result = null;
+//    
+//    for (Dataset ds : this.cachedQueryResults)
+//    {
+//      try
+//      {
+//        if (ds.get("OID").equals(oid))
+//        {
+//          result = ds;
+//          break;
+//        }
+//      } catch (ColumnNotFoundException e)
+//      {
+//        LOGGER.error("", e);
+//      }
+//    }
+//
+//    return result;
+//  }
+//
+//  public Set<String> getOIDsFromLOS() {
+//    Set<String> oids = new HashSet<>();
+//    for (Dataset dataset : myLOS) {
+//      try
+//      {
+//        oids.add(dataset.get("OID"));
+//      } catch (ColumnNotFoundException e)
+//      {
+//        LOGGER.error("", e);
+//      }
+//    }
+//    
+//    return oids;
+//  }
 
-    Dataset result = null;
-    
-    for (Dataset ds : this.cachedQueryResults)
-    {
-      try
-      {
-        if (ds.get("OID").equals(oid))
-        {
-          result = ds;
-          break;
-        }
-      } catch (ColumnNotFoundException e)
-      {
-        LOGGER.error("", e);
-      }
-    }
-
-    return result;
-  }
-
-  public Set<String> getOIDsFromLOS() {
-    Set<String> oids = new HashSet<>();
-    for (Dataset dataset : myLOS) {
-      try
-      {
-        oids.add(dataset.get("OID"));
-      } catch (ColumnNotFoundException e)
-      {
-        LOGGER.error("", e);
-      }
-    }
-    
-    return oids;
-  }
-
-  public static final Comparator<DJDataset> sortPAL = (ds1, ds2) ->
-  {
-    try
-    {
-      return ds1.get("Nachname").compareTo(ds2.get("Nachname"));
-    } catch (ColumnNotFoundException e)
-    {
-      LOGGER.error("", e);
-    }
-
-    return 0;
-  };
+//  public static final Comparator<DJDataset> sortPAL = (ds1, ds2) ->
+//  {
+//    try
+//    {
+//      return ds1.get("Nachname").compareTo(ds2.get("Nachname"));
+//    } catch (ColumnNotFoundException e)
+//    {
+//      LOGGER.error("", e);
+//    }
+//
+//    return 0;
+//  };
 
   /**
    * Legt einen neuen Datensatz im LOS an, der nicht mit einer Hintergrunddatenbank

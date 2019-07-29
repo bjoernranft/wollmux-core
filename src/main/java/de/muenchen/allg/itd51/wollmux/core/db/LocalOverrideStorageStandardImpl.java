@@ -598,7 +598,7 @@ public class LocalOverrideStorageStandardImpl implements LocalOverrideStorage
    * 
    * @author Matthias Benkmann (D-III-ITD 5.1)
    */
-  private class LOSDJDataset extends DJDatasetBase
+  public class LOSDJDataset extends DJDatasetBase
   {
     /**
      * Der Schlüsselwert dieses Datensatzes.
