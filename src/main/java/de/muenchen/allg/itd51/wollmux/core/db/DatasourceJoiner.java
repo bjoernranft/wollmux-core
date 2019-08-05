@@ -601,18 +601,18 @@ public class DatasourceJoiner
 //    return oids;
 //  }
 
-//  public static final Comparator<DJDataset> sortPAL = (ds1, ds2) ->
-//  {
-//    try
-//    {
-//      return ds1.get("Nachname").compareTo(ds2.get("Nachname"));
-//    } catch (ColumnNotFoundException e)
-//    {
-//      LOGGER.error("", e);
-//    }
-//
-//    return 0;
-//  };
+  public static final Comparator<DJDataset> sortPAL = (ds1, ds2) ->
+  {
+    try
+    {
+      return ds1.get("Nachname").compareTo(ds2.get("Nachname"));
+    } catch (ColumnNotFoundException e)
+    {
+      LOGGER.error("", e);
+    }
+
+    return 0;
+  };
 
   /**
    * Legt einen neuen Datensatz im LOS an, der nicht mit einer Hintergrunddatenbank
