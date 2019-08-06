@@ -229,7 +229,8 @@ public class SimpleDialogLayout extends AbstractWindowListener
           : xOffsetTemp;
 
       // full width
-      wnd.setPosSize(xOffsetTemp, yOffset, windowRect.Width,
+      // TODO: -10 sollte nicht nötig sein, dirty hack wegen sidebar controls überlappung.
+      wnd.setPosSize(xOffsetTemp, yOffset, windowRect.Width - this.getMarginLeft() - 10,
           controlProperties.getControlPercentSize().getHeight(), (PosSize.POSSIZE));
     }
 
